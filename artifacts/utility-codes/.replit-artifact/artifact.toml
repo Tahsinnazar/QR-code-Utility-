@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "UtilityCodes"
+description = "A browser-only utility suite for generating customizable QR codes and industrial barcodes, batching exports, printing label sheets, and scanning text with a camera."
+version = "1.0.0"
+id = "artifacts/utility-codes"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 18908
+
+[services.development]
+run = "pnpm --filter @workspace/utility-codes run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/utility-codes", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/utility-codes/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "18908"
+BASE_PATH = "/"

@@ -1,0 +1,1 @@
+- [UtilityCodes browser-only scope](utilitycodes-scope.md) — all code generation, file handling, batch exports, and OCR must stay on the user's device.
