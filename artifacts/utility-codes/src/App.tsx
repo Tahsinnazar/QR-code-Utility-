@@ -496,8 +496,6 @@ function Workspace({ preset }: { preset?: string }) {
         const item = batchItems[i];
         const qr = new QRCodeStyling({
           width: 540, height: 540, type: 'svg', data: item, margin: 16,
-          image: logoUrl || undefined,
-          imageOptions: { hideBackgroundDots: true, imageSize: 0.22, margin: 5, crossOrigin: 'anonymous' },
           dotsOptions: { color: fg, type: dotStyles[pattern] || 'rounded' },
           cornersSquareOptions: { color: fg, type: eyeFrame as 'dot' | 'square' | 'extra-rounded' | 'rounded' | 'dots' | 'classy' | 'classy-rounded' },
           cornersDotOptions: { color: fg, type: eyeCenter as 'dot' | 'square' },
@@ -506,7 +504,8 @@ function Workspace({ preset }: { preset?: string }) {
         const raw = await qr.getRawData('svg');
         if (raw) {
           const svg = raw instanceof Blob ? await raw.text() : raw.toString();
-          zip.file(`${String(i + 1).padStart(3, '0')}-code.png`, await svgToPng(addQrFrame(svg, qrFrame, fg, bg)));
+          const withLogo = addQrLogo(svg, logoUrl, logoBadge, logoScale);
+          zip.file(`${String(i + 1).padStart(3, '0')}-code.png`, await svgToPng(addQrFrame(withLogo, qrFrame, fg, bg), exportPixels));
         }
       }
       const blob = await zip.generateAsync({ type: 'blob' });
@@ -562,14 +561,87 @@ function Workspace({ preset }: { preset?: string }) {
           {kind === 'vCard' && <><div className="form-grid"><Field label="Full name"><input className="control" value={name} onChange={e => setName(e.target.value)} placeholder="Sam Taylor" data-testid="input-vcard-name" /></Field><Field label="Company"><input className="control" value={company} onChange={e => setCompany(e.target.value)} placeholder="Company name" data-testid="input-vcard-company" /></Field><Field label="Phone"><input className="control" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+1 555 0100" data-testid="input-vcard-phone" /></Field><Field label="Email"><input className="control" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="sam@example.com" data-testid="input-vcard-email" /></Field></div></>}
           {kind === 'WhatsApp' && <><Field label="WhatsApp phone number" help="Include the country code; spaces and punctuation are removed."><input className="control" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+1 555 0100" data-testid="input-whatsapp-phone" /></Field><Field label="Prefilled message (optional)"><textarea className="textarea-control" value={whatsMessage} onChange={e => setWhatsMessage(e.target.value)} placeholder="Hi! I'd like to know more…" data-testid="input-whatsapp-message" rows={2} /></Field></>}
           {kind === 'Phone' && <Field label="Phone number"><input className="control" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+1 555 0100" data-testid="input-qr-phone" /></Field>}
-          <div className="subsection"><div className="control-head"><div><h3 className="section-title">Customize the look</h3><p className="section-hint">Changes update your preview as you type.</p></div><Sparkles size={17} color="#64748b" /></div>
-             <div className="form-grid"><Field label="Dot pattern"><select className="select-control" value={pattern} onChange={e => setPattern(e.target.value)} data-testid="select-qr-pattern"><option value="square">Square</option><option value="rounded">Rounded</option><option value="dots">Dots</option><option value="classy">Classy</option><option value="fluid">Fluid</option><option value="extra-rounded">Extra rounded</option></select></Field><Field label="Error correction"><select className="select-control" value={ecc} onChange={e => setEcc(e.target.value)} data-testid="select-error-correction"><option value="L">Low (L)</option><option value="M">Medium (M)</option><option value="Q">Quartile (Q)</option><option value="H">High (H)</option></select></Field></div>
-             <div className="form-grid"><Field label="Center eye frame"><select className="select-control" value={eyeFrame} onChange={e => setEyeFrame(e.target.value)} data-testid="select-eye-frame"><option value="square">Square</option><option value="extra-rounded">Rounded</option><option value="dot">Circular</option></select></Field><Field label="Center eye"><select className="select-control" value={eyeCenter} onChange={e => setEyeCenter(e.target.value)} data-testid="select-eye-center"><option value="dot">Circular</option><option value="square">Square</option></select></Field></div>
-             <div className="form-grid"><Field label="Call-to-action frame"><select className="select-control" value={qrFrame} onChange={e => setQrFrame(e.target.value)} data-testid="select-qr-frame"><option value="none">No frame</option><option value="scan">Scan me</option><option value="point">Point your camera</option></select></Field><Field label="Brand icon"><select className="select-control" value={logoPreset} onChange={e => selectLogoPreset(e.target.value)} data-testid="select-logo-preset"><option value="none">No icon</option><option value="instagram">Instagram</option><option value="whatsapp">WhatsApp</option><option value="youtube">YouTube</option><option value="globe">Globe</option><option value="shop">Shopping bag</option><option value="custom">Custom upload</option></select></Field></div>
-            <div className="form-grid"><Field label="Code color"><div className="swatch-row"><input className="color-input" type="color" value={fg} onChange={e => setFg(e.target.value)} data-testid="color-foreground" /><input className="control color-code" value={fg} onChange={e => setFg(e.target.value)} aria-label="Foreground hex color" /></div></Field><Field label="Background color"><div className="swatch-row"><input className="color-input" type="color" value={bg} onChange={e => setBg(e.target.value)} data-testid="color-background" /><input className="control color-code" value={bg} onChange={e => setBg(e.target.value)} aria-label="Background hex color" /></div></Field></div>
-            <label className="toggle-line"><span>Keep a clear quiet zone</span><input type="checkbox" checked={includeMargin} onChange={e => setIncludeMargin(e.target.checked)} data-testid="toggle-quiet-zone" /></label>
-             <div className="field"><label>Center logo <span style={{fontWeight:400,color:'#94a3b8'}}>(optional)</span></label><div className="logo-drop"><ImagePlus size={18} /><div><input type="file" accept="image/png,image/jpeg,image/svg+xml" onChange={e => handleLogo(e.target.files?.[0])} data-testid="input-logo-upload" /><div className="field-help">PNG, JPG or SVG · local only</div></div>{logoUrl && <button className="btn" onClick={() => { setLogoUrl(''); setLogoPreset('none'); }} aria-label="Remove logo" data-testid="button-remove-logo"><X size={14} /> Remove</button>}</div></div>
-          </div>
+           <div className="subsection qr-customizer">
+             <div className="control-head"><div><h3 className="section-title"><span className="step-number">2</span> Design your QR</h3><p className="section-hint">Explore the shape, logo and scan settings.</p></div><Sparkles size={17} color="#64748b" /></div>
+             <div className="qr-design-tabs" role="tablist" aria-label="QR design settings">
+               {([
+                 ['frame', 'Frame', <ImagePlus size={14} />],
+                 ['shape', 'Shape', <QrCode size={14} />],
+                 ['logo', 'Logo', <ImagePlus size={14} />],
+                 ['level', 'Level', <ShieldCheck size={14} />],
+               ] as [QrDesignTab, string, ReactNode][]).map(([key, label, icon]) => <button key={key} type="button" role="tab" aria-selected={qrDesignTab === key} className={`qr-design-tab ${qrDesignTab === key ? 'active' : ''}`} onClick={() => setQrDesignTab(key)} data-testid={`qr-design-tab-${key}`}>{icon}{label}</button>)}
+             </div>
+
+             <div className="qr-design-content">
+               {qrDesignTab === 'shape' && <>
+                 <div className="design-section-head"><div><strong>Shape style</strong><span>Choose the module look that fits your brand.</span></div></div>
+                 <div className="shape-card-grid" role="group" aria-label="QR shape styles">
+                   {([
+                     ['square', 'Square', 'Crisp and classic'],
+                     ['rounded', 'Soft', 'Smooth corners'],
+                     ['dots', 'Dots', 'Light and friendly'],
+                     ['classy', 'Classy', 'Distinctive detail'],
+                     ['fluid', 'Fluid', 'Organic flow'],
+                     ['extra-rounded', 'Pill', 'Extra rounded'],
+                   ] as [string, string, string][]).map(([value, label, hint]) => <button key={value} type="button" className={`shape-card ${pattern === value ? 'active' : ''}`} aria-label={`${label} QR shape`} aria-pressed={pattern === value} onClick={() => setPattern(value)} data-testid={`button-shape-${value}`}>
+                     <span className="shape-card-art"><QrPatternThumb pattern={value} />{pattern === value && <span className="shape-selected"><Check size={12}/></span>}</span><span className="shape-card-label">{label}</span><span className="shape-card-hint">{hint}</span>
+                   </button>)}
+                 </div>
+                 <div className="design-section-head eye-heading"><div><strong>Finder eyes</strong><span>Shape the three corner markers.</span></div></div>
+                 <div className="eye-options">
+                   <div className="eye-option-group"><span className="eye-option-label">Outer frame</span><div className="eye-option-buttons">{([
+                     ['square', 'Square'], ['extra-rounded', 'Rounded'], ['dot', 'Circle'],
+                   ] as [string, string][]).map(([value, label]) => <button key={value} type="button" className={`eye-option ${eyeFrame === value ? 'active' : ''}`} aria-label={`${label} finder frame`} aria-pressed={eyeFrame === value} onClick={() => setEyeFrame(value)}><span className={`eye-glyph outer-${value}`}><i /></span></button>)}</div></div>
+                   <div className="eye-option-group"><span className="eye-option-label">Center mark</span><div className="eye-option-buttons">{([
+                     ['square', 'Square'], ['dot', 'Circle'],
+                   ] as [string, string][]).map(([value, label]) => <button key={value} type="button" className={`eye-option ${eyeCenter === value ? 'active' : ''}`} aria-label={`${label} finder center`} aria-pressed={eyeCenter === value} onClick={() => setEyeCenter(value)}><span className={`eye-glyph inner-${value}`}><i /></span></button>)}</div></div>
+                 </div>
+                 <div className="design-color-row">
+                   <Field label="Code color"><div className="swatch-row"><input className="color-input" type="color" value={fg} onChange={e => setFg(e.target.value)} data-testid="color-foreground" /><input className="control color-code" value={fg} onChange={e => setFg(e.target.value)} aria-label="Foreground hex color" /></div></Field>
+                   <Field label="Background color"><div className="swatch-row"><input className="color-input" type="color" value={bg} onChange={e => setBg(e.target.value)} data-testid="color-background" /><input className="control color-code" value={bg} onChange={e => setBg(e.target.value)} aria-label="Background hex color" /></div></Field>
+                   <button className="invert-colors" type="button" onClick={() => { setFg(bg); setBg(fg); }} data-testid="button-invert-colors">Invert</button>
+                 </div>
+               </>}
+
+               {qrDesignTab === 'frame' && <>
+                 <div className="design-section-head"><div><strong>Call-to-action frame</strong><span>Add a short invitation below your code.</span></div></div>
+                 <div className="frame-card-grid" role="group" aria-label="QR call-to-action frame">
+                   {([
+                     ['none', 'No frame', 'Just the code'],
+                     ['scan', 'Scan me', 'Clear and direct'],
+                     ['point', 'Point your camera', 'Helpful instruction'],
+                   ] as [string, string, string][]).map(([value, label, hint]) => <button key={value} type="button" className={`frame-card ${qrFrame === value ? 'active' : ''}`} aria-pressed={qrFrame === value} onClick={() => setQrFrame(value)} data-testid={`button-frame-${value}`}><span className="frame-card-code"><QrCode size={22}/>{value !== 'none' && <small>{value === 'scan' ? 'SCAN ME' : 'POINT CAMERA'}</small>}</span><strong>{label}</strong><span>{hint}</span></button>)}
+                 </div>
+                 <label className="toggle-line"><span><strong>Keep a quiet zone</strong><small>Leave a clear margin around the QR pattern for easier scanning.</small></span><input type="checkbox" checked={includeMargin} onChange={e => setIncludeMargin(e.target.checked)} data-testid="toggle-quiet-zone" /></label>
+               </>}
+
+               {qrDesignTab === 'logo' && <>
+                 <div className="design-section-head"><div><strong>Center logo</strong><span>Place your own mark in the middle of the code.</span></div></div>
+                 {logoUrl ? <div className="logo-preview-card"><span className="logo-preview-image"><img src={logoUrl} alt="Uploaded center logo preview" /></span><span className="logo-preview-copy"><strong>{logoPreset === 'custom' ? 'Your uploaded logo' : `${logoPreset[0].toUpperCase()}${logoPreset.slice(1)} icon`}</strong><small>It will appear in the live QR and in PNG/SVG exports.</small></span><button className="logo-remove" type="button" onClick={() => { setLogoUrl(''); setLogoPreset('none'); }} aria-label="Remove center logo" data-testid="button-remove-logo"><X size={15}/></button></div> : <label className="logo-upload-card" htmlFor="center-logo-file">
+                   <span className="logo-upload-icon"><ImagePlus size={19}/></span><span><strong>Upload a center logo</strong><small>PNG, JPG, WebP or SVG · up to 8 MB · processed here</small></span><span className="logo-upload-action">Choose file</span><input id="center-logo-file" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" onChange={e => { void handleLogo(e.target.files?.[0]); e.currentTarget.value = ''; }} data-testid="input-logo-upload" />
+                 </label>}
+                 <div className="logo-preset-row"><span className="eye-option-label">Or use a ready-made mark</span><div className="logo-presets">
+                   {([['instagram','Instagram'],['whatsapp','WhatsApp'],['youtube','YouTube'],['globe','Globe'],['shop','Shop']] as [string,string][]).map(([value,label]) => <button key={value} type="button" className={`logo-preset ${logoPreset === value ? 'active' : ''}`} onClick={() => selectLogoPreset(value)} aria-label={`Use ${label} logo`} aria-pressed={logoPreset === value} data-testid={`logo-preset-${value}`}><img src={brandMarkData(value)} alt="" /><span>{label}</span></button>)}
+                 </div></div>
+                 {logoUrl && <div className="logo-detail-controls"><div className="logo-badge-options"><span className="eye-option-label">Logo backing</span>{([['rounded','Rounded'],['square','Square'],['circle','Circle']] as [string,string][]).map(([value,label]) => <button key={value} type="button" className={`mini-choice ${logoBadge === value ? 'active' : ''}`} onClick={() => setLogoBadge(value)} aria-pressed={logoBadge === value}>{label}</button>)}</div><Field label={`Logo size · ${Math.round(logoScale * 100)}%`}><input className="range-control" type="range" min=".12" max=".22" step=".01" value={logoScale} onChange={e => setLogoScale(Number(e.target.value))} aria-label="Center logo size" data-testid="range-logo-size" /></Field></div>}
+                 {logoUrl && <div className="notice logo-scan-note"><strong>Logo added.</strong> High error correction is selected to help preserve scan reliability. Test the exported code with a phone.</div>}
+               </>}
+
+               {qrDesignTab === 'level' && <>
+                 <div className="design-section-head"><div><strong>Error correction</strong><span>More correction improves recovery, with a denser pattern.</span></div></div>
+                 <div className="level-card-grid" role="group" aria-label="Error correction level">
+                   {([
+                     ['L', 'Low', '7% recovery'],
+                     ['M', 'Medium', '15% recovery'],
+                     ['Q', 'Quartile', '25% recovery'],
+                     ['H', 'High', '30% recovery'],
+                   ] as [string, string, string][]).map(([value, label, hint]) => <button key={value} type="button" className={`level-card ${ecc === value ? 'active' : ''}`} aria-pressed={ecc === value} onClick={() => setEcc(value)} data-testid={`button-ecc-${value}`}><span>{value}</span><strong>{label}</strong><small>{hint}</small></button>)}
+                 </div>
+                 <Field label="PNG export quality" help="The preview stays quick. The PNG is rendered directly from vector data at this size."><select className="select-control" value={exportPixels} onChange={e => setExportPixels(Number(e.target.value))} data-testid="select-export-pixels"><option value="1024">1024 px · web</option><option value="2048">2048 px · high quality</option><option value="4096">4096 px · print ready</option></select></Field>
+                 <div className="vector-note"><QrCode size={16}/><span><strong>SVG stays sharp at any size.</strong><small>Choose PNG when you need a fixed pixel image.</small></span></div>
+               </>}
+             </div>
+           </div>
         </>}
 
         {mode === 'barcode' && <>
@@ -611,19 +683,19 @@ function Workspace({ preset }: { preset?: string }) {
         <div className="control-head"><div><h2 className="section-title">{mode === 'labels' ? 'A4 sheet preview' : 'Live preview'}</h2><p className="section-hint">{mode === 'scanner' ? 'Recognized output stays on this device.' : mode === 'bulk' ? `${batchItems.length} entries in this batch` : 'Export a crisp image or a scalable vector.'}</p></div>{mode !== 'scanner' && <span className="privacy-pill" style={{padding:'6px 9px',fontSize:10}}><LockKeyhole size={12}/> Local</span>}</div>
         {mode === 'labels' ? <div className="print-sheet" style={{gridTemplateColumns:`repeat(${labelRows === 6 ? 2 : 3},1fr)`}} data-density={labelRows} data-testid="preview-label-sheet">{Array.from({length: labelRows}, (_, i) => {
           const val = batchItems[i] || batchItems[0] || `Label ${i + 1}`;
-          return <div className="print-label" key={i} data-testid={`print-label-${i}`}>{labelBarcode ? <BarcodeCell value={val} kind={barcodeKind} fg={fg} bg={bg} /> : <><LabelQr value={val} fg={fg} bg={bg} pattern={pattern} ecc={ecc} logoUrl={logoUrl} frame={qrFrame} eyeFrame={eyeFrame} eyeCenter={eyeCenter} /><span>{val}</span></>}</div>;
+          return <div className="print-label" key={i} data-testid={`print-label-${i}`}>{labelBarcode ? <BarcodeCell value={val} kind={barcodeKind} fg={fg} bg={bg} /> : <><LabelQr value={val} fg={fg} bg={bg} pattern={pattern} ecc={ecc} logoUrl={logoUrl} logoBadge={logoBadge} logoScale={logoScale} frame={qrFrame} eyeFrame={eyeFrame} eyeCenter={eyeCenter} /><span>{val}</span></>}</div>;
         })}</div> : mode === 'scanner' ? <div className="preview-stage"><div className="placeholder-art"><ScanLine size={32} /><div>OCR reads text from an image using your browser.</div></div></div> : <div className="preview-stage">
           {mode === 'barcode' ? codeData && <img className="code-output barcode-output" src={codeData} alt="Generated barcode preview" data-testid="image-barcode-preview" /> : codeData ? <img className="code-output qr-output" src={codeData} alt="Generated QR code preview" data-testid="image-qr-preview" /> : <div className="placeholder-art"><QrCode size={34}/><div>Enter your content to see a live QR preview.</div></div>}
           {mode === 'barcode' && !codeData && <div className="placeholder-art"><Barcode size={34}/><div>Enter a valid value to preview your barcode.</div></div>}
         </div>}
-        <div className="preview-meta"><span>{mode === 'barcode' ? `${barcodeKind} · ${barcodeKind === 'EAN13' || barcodeKind === 'UPC' ? 'check digit included' : 'barcode'}` : mode === 'labels' ? `A4 · ${labelRows} labels` : mode === 'bulk' ? 'PNG files · ZIP archive' : 'PNG · 640 × 640 px'}</span>{mode === 'qr' && <span>{qrText.length} chars</span>}</div>
-        {mode === 'qr' || mode === 'barcode' ? <div className={`download-row ${codeData ? '' : 'disabled'}`}><button className="download-btn png" onClick={downloadPng} data-testid="button-download-png"><ArrowDownToLine size={15}/> Download PNG</button><button className="download-btn svg" onClick={downloadSvg} data-testid="button-download-svg"><ArrowDownToLine size={15}/> Download SVG</button></div>
+        <div className="preview-meta"><span>{mode === 'barcode' ? `${barcodeKind} · ${barcodeKind === 'EAN13' || barcodeKind === 'UPC' ? 'check digit included' : 'barcode'}` : mode === 'labels' ? `A4 · ${labelRows} labels` : mode === 'bulk' ? 'PNG files · ZIP archive' : `PNG · ${exportPixels}px output`}</span>{mode === 'qr' && <span>{qrText.length} chars</span>}</div>
+        {mode === 'qr' || mode === 'barcode' ? <div className={`download-row ${codeData ? '' : 'disabled'}`}><button className="download-btn png" onClick={downloadPng} data-testid="button-download-png"><ArrowDownToLine size={15}/> Download PNG{mode === 'qr' ? ` · ${exportPixels}px` : ''}</button><button className="download-btn svg" onClick={downloadSvg} data-testid="button-download-svg"><ArrowDownToLine size={15}/> Download SVG</button></div>
           : mode === 'labels' ? <button className="btn btn-primary print-hide" style={{width:'100%',marginTop:12}} onClick={() => window.print()} data-testid="button-print-preview"><ArrowDownToLine size={15}/> Print A4 sheet</button>
           : mode === 'bulk' ? <div className="notice" style={{marginTop:12}}>Each line becomes a numbered PNG in a browser-generated ZIP. No files are uploaded.</div> : <div className="notice" style={{marginTop:12}}>No photo or recognized text leaves your browser.</div>}
         {mode === 'qr' || mode === 'barcode' ? <div className="notice" style={{marginTop:12}}>For best scan results, keep a clear border and use dark marks on a light background.</div> : null}
       </section>
     </div>
-    {(mode === 'qr' || mode === 'barcode') && <div className={`mobile-download ${codeData ? '' : 'disabled'}`}><button className="download-btn png" onClick={downloadPng} data-testid="mobile-download-png"><ArrowDownToLine size={15}/> Download PNG</button><button className="download-btn svg" onClick={downloadSvg} data-testid="mobile-download-svg"><ArrowDownToLine size={15}/> Download SVG</button></div>}
+    {(mode === 'qr' || mode === 'barcode') && <div className={`mobile-download ${codeData ? '' : 'disabled'}`}><button className="download-btn png" onClick={downloadPng} data-testid="mobile-download-png"><ArrowDownToLine size={15}/> PNG{mode === 'qr' ? ` · ${exportPixels}px` : ''}</button><button className="download-btn svg" onClick={downloadSvg} data-testid="mobile-download-svg"><ArrowDownToLine size={15}/> Download SVG</button></div>}
 
     <section className="guide-section"><div className="eyebrow">Built for the everyday workflow</div><h2 className="guide-title">A useful code, minus the busywork.</h2><p className="guide-copy">Make a one-off link code, tailor a network QR for visitors, create a barcode with a checked retail digit, or batch a set of codes into a ZIP. UtilityCodes keeps content and files in your current browser session — there is no account and no upload step.</p><div className="guide-links">{guideRoutes.map(([url, label]) => <Link key={url} href={url} className="guide-link" data-testid={`guide-${url.slice(1)}`}>{label}<ChevronRight size={13} style={{verticalAlign:'middle',marginLeft:4}} /></Link>)}</div><div className="faq-list" style={{marginTop:20}}>{[
       ['Does UtilityCodes upload my content?', 'No. QR and barcode generation, batch ZIP creation and OCR are processed in your browser.'],
@@ -633,15 +705,13 @@ function Workspace({ preset }: { preset?: string }) {
   </main>;
 }
 
-function LabelQr({ value, fg, bg, pattern, ecc, logoUrl, frame, eyeFrame, eyeCenter }: { value: string; fg: string; bg: string; pattern: string; ecc: string; logoUrl: string; frame: string; eyeFrame: string; eyeCenter: string }) {
+function LabelQr({ value, fg, bg, pattern, ecc, logoUrl, logoBadge, logoScale, frame, eyeFrame, eyeCenter }: { value: string; fg: string; bg: string; pattern: string; ecc: string; logoUrl: string; logoBadge: string; logoScale: number; frame: string; eyeFrame: string; eyeCenter: string }) {
   const [src, setSrc] = useState('');
   useEffect(() => {
     let alive = true;
     let objectUrl = '';
     const qr = new QRCodeStyling({
       width: 180, height: 180, type: 'svg', data: value, margin: 8,
-      image: logoUrl || undefined,
-      imageOptions: { hideBackgroundDots: true, imageSize: 0.22, margin: 5 },
       dotsOptions: { color: fg, type: dotStyles[pattern] || 'rounded' },
       cornersSquareOptions: { color: fg, type: eyeFrame as 'dot' | 'square' | 'extra-rounded' | 'rounded' | 'dots' | 'classy' | 'classy-rounded' },
       cornersDotOptions: { color: fg, type: eyeCenter as 'dot' | 'square' },
@@ -650,13 +720,13 @@ function LabelQr({ value, fg, bg, pattern, ecc, logoUrl, frame, eyeFrame, eyeCen
     qr.getRawData('svg').then(async blob => {
       if (!blob || !alive) return;
       const svg = blob instanceof Blob ? await blob.text() : blob.toString();
-      const imageBlob = await svgToPng(addQrFrame(svg, frame, fg, bg));
+      const imageBlob = await svgToPng(addQrFrame(addQrLogo(svg, logoUrl, logoBadge, logoScale), frame, fg, bg));
       if (!alive) return;
       objectUrl = URL.createObjectURL(imageBlob);
       setSrc(objectUrl);
     }).catch(() => undefined);
     return () => { alive = false; if (objectUrl) URL.revokeObjectURL(objectUrl); };
-  }, [value, fg, bg, pattern, ecc, logoUrl, frame, eyeFrame, eyeCenter]);
+  }, [value, fg, bg, pattern, ecc, logoUrl, logoBadge, logoScale, frame, eyeFrame, eyeCenter]);
   return src ? <img src={src} alt={`QR code for ${value}`} style={{width:58,height:58,objectFit:'contain'}} data-testid={`label-qr-${value.slice(0,16)}`} /> : <span aria-label="Generating QR code">…</span>;
 }
 
