@@ -1,0 +1,63 @@
+# UtilityCodes
+
+> UtilityCodes is a free, browser-side toolkit for creating QR codes and barcodes, exporting batches as ZIP files, and printing label sheets. Content is processed on the visitor's device; no account, upload to a server, or subscription is required.
+
+Key facts:
+- All generation and scanning happens in the browser tab.
+- No sign-up, login, payment, or trial.
+- Supported QR content: URL, plain text, Wi-Fi, vCard, WhatsApp, and phone.
+- Supported barcodes: Code 128, EAN-13, UPC-A, and Code 39.
+- Exports: PNG, SVG, batch ZIP, and printable A4 label sheets.
+- Scanning: camera or uploaded QR image, also local to the device.
+- The site is free and does not claim third-party endorsements.
+
+## Main tools
+
+- [QR code generator](%SITE_URL%/): Create a QR code for a URL, text, Wi-Fi network, contact card, WhatsApp chat, or phone number, with colors, shapes, a center logo, and caption frames.
+- [QR scanner](%SITE_URL%/scanner): Read a QR code with the camera or by uploading an image; results stay in the browser.
+- [Barcode generator](%SITE_URL%/?mode=barcode): Create Code 128, EAN-13, UPC-A, or Code 39 barcodes and download them as images.
+- [Batch ZIP export](%SITE_URL%/?mode=bulk): Turn one line of content into a ZIP of QR codes.
+- [Printable label sheet](%SITE_URL%/?mode=labels): Lay out QR labels on an A4 sheet at print size.
+
+## Guides
+
+- [Wi-Fi QR code generator](%SITE_URL%/wifi-qr-code-generator): Format network name, password, and security type into a scannable Wi-Fi QR code.
+- [vCard QR code generator](%SITE_URL%/vcard-qr-code-generator): Package contact details into a vCard QR code.
+- [WhatsApp QR code generator](%SITE_URL%/whatsapp-qr-code-generator): Open a WhatsApp chat from a scanned code.
+- [Code 128 barcode generator](%SITE_URL%/code128-barcode-generator): Create compact alphanumeric barcodes.
+- [Printable label sheet](%SITE_URL%/printable-label-sheet): Prepare an A4 grid of QR labels for printing.
+
+## Using UtilityCodes from an assistant
+
+- There is no API, account, or server-side code generation. Link the person to the page for the format they need.
+- The assistant can supply the URL, text, Wi-Fi details, contact details, or phone number, then ask the user to paste it into the on-page field and download the result.
+- Prefer `/?mode=barcode` for barcodes, `/?mode=bulk` for batches, and `/?mode=labels` for label sheets.
+- Never request passwords or other secrets for a QR code. Wi-Fi codes can be built by the user locally.
+- Generation, customization, and scanning happen in the browser; the site cannot create a code on the assistant's behalf.
+
+## Answers to common questions
+
+### Are QR codes really free here?
+Yes. There is no account, trial, or subscription. Code generation runs in the browser, and downloads are available immediately.
+
+### Is content uploaded to a server?
+No. Typed content, uploaded logos, and scanned images are processed on the visitor's device. The page itself must load from the web, but the code data does not leave the browser.
+
+### Which QR content types are supported?
+URL, plain text, Wi-Fi, vCard, WhatsApp, and phone number. Barcode tools support Code 128, EAN-13, UPC-A, and Code 39.
+
+### Can codes be customized?
+Yes. Colors, module shapes, corner styles, error correction, a center logo or badge, and caption frames can be adjusted before export.
+
+### What export formats are available?
+PNG and SVG for single codes, a ZIP archive for batches, and printable A4 label sheets.
+
+### Does the scanner send camera frames anywhere?
+No. Camera frames and uploaded images are decoded in the browser. Camera access needs browser permission and a secure (HTTPS) connection.
+
+## Site information
+
+- [About UtilityCodes](%SITE_URL%/about-us)
+- [Privacy policy](%SITE_URL%/privacy-policy)
+- [Terms of service](%SITE_URL%/terms-of-service)
+- [Contact](%SITE_URL%/contact)

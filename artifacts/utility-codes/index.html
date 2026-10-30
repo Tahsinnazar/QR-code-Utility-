@@ -2,23 +2,114 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#ff4d00" />
     <title>Free QR &amp; Barcode Generator — UtilityCodes</title>
-    <meta name="description" content="Create QR codes, barcodes, batch ZIP exports and print-ready labels locally in your browser. No account, no uploads." />
-    <meta name="robots" content="index, follow" />
-    <meta property="og:title" content="UtilityCodes" />
-    <meta property="og:description" content="Create QR codes, barcodes, batch ZIP exports and print-ready labels locally in your browser." />
+    <meta
+      name="description"
+      content="Create custom QR codes and barcodes, export batch ZIP files and print label sheets. Free, no account, and processed entirely in your browser."
+    />
+    <meta
+      name="robots"
+      content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+    />
+    <meta property="og:site_name" content="UtilityCodes" />
+    <meta property="og:locale" content="en_US" />
     <meta property="og:type" content="website" />
+    <meta property="og:title" content="Free QR &amp; Barcode Generator — UtilityCodes" />
+    <meta
+      property="og:description"
+      content="Create custom QR codes and barcodes, export batch ZIP files and print label sheets. Free, no account, and processed entirely in your browser."
+    />
+    <meta property="og:url" content="%SITE_URL%/" />
+    <meta property="og:image" content="%SITE_URL%/assets/og-utilitycodes.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="UtilityCodes — free QR and barcode tools that run in your browser"
+    />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="UtilityCodes" />
-    <meta name="twitter:description" content="Create QR codes, barcodes, batch ZIP exports and print-ready labels locally in your browser." />
+    <meta name="twitter:title" content="Free QR &amp; Barcode Generator — UtilityCodes" />
+    <meta
+      name="twitter:description"
+      content="Create custom QR codes and barcodes, export batch ZIP files and print label sheets. Free, no account, and processed entirely in your browser."
+    />
+    <meta name="twitter:image" content="%SITE_URL%/assets/og-utilitycodes.png" />
+    <meta
+      name="twitter:image:alt"
+      content="UtilityCodes — free QR and barcode tools that run in your browser"
+    />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <script type="application/ld+json">
-      {"@context":"https://schema.org","@type":"SoftwareApplication","name":"UtilityCodes","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","description":"Browser-side QR code, barcode, batch ZIP and printable label tools."}
+    <link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt" />
+    <link
+      rel="preload"
+      href="/fonts/SpaceGrotesk-latin.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link rel="preconnect" href="https://lottie.host" crossorigin />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script type="application/ld+json" id="utilitycodes-jsonld">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "%SITE_URL%/#organization",
+            "name": "UtilityCodes",
+            "url": "%SITE_URL%/",
+            "description": "Free, browser-side tools for QR codes, barcodes, batch exports and printable labels.",
+            "logo": {
+              "@type": "ImageObject",
+              "url": "%SITE_URL%/assets/og-utilitycodes.png"
+            }
+          },
+          {
+            "@type": "WebSite",
+            "@id": "%SITE_URL%/#website",
+            "name": "UtilityCodes",
+            "url": "%SITE_URL%/",
+            "inLanguage": "en",
+            "publisher": { "@id": "%SITE_URL%/#organization" }
+          },
+          {
+            "@type": "SoftwareApplication",
+            "@id": "%SITE_URL%/#app",
+            "name": "UtilityCodes",
+            "url": "%SITE_URL%/",
+            "description": "Create customizable QR codes and barcodes, export batches as ZIP files and prepare printable label sheets — entirely in the browser.",
+            "applicationCategory": "UtilitiesApplication",
+            "operatingSystem": "Any",
+            "browserRequirements": "Works in modern browsers",
+            "isAccessibleForFree": true,
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD"
+            },
+            "featureList": [
+              "QR codes for URLs, text, Wi-Fi, vCard, WhatsApp and phone numbers",
+              "Code 128, EAN-13, UPC-A and Code 39 barcodes",
+              "Center logos, custom colors, dot shapes and caption frames",
+              "PNG and SVG downloads, plus batch ZIP export",
+              "Printable A4 QR label sheets",
+              "In-browser camera and image QR scanner"
+            ],
+            "image": "%SITE_URL%/assets/og-utilitycodes.png",
+            "publisher": { "@id": "%SITE_URL%/#organization" }
+          }
+        ]
+      }
     </script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   </head>
   <body>
     <div id="root"></div>

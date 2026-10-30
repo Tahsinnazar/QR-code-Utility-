@@ -1,3 +1,37 @@
+# UtilityCodes — free, browser-side QR and barcode tools.
+# All public pages are open to people and answer engines.
+
 User-agent: *
 Allow: /
-Sitemap: /sitemap.xml
+
+# AI / answer-engine crawlers: explicitly welcome. UtilityCodes has no
+# private URLs, accounts or gated content, so there is nothing to exclude.
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+# A prepared summary for AI agents and assistants lives at /llms.txt.
+# The XML sitemap is appended automatically when a production origin is known.

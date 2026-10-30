@@ -29,6 +29,9 @@ if (!basePath) {
 
 export default defineConfig({
   base: basePath,
+  define: {
+    __PUBLIC_SITE_URL__: JSON.stringify(process.env.PUBLIC_SITE_URL || ""),
+  },
   plugins: [
     mockupPreviewPlugin(),
     react(),
